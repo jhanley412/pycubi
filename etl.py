@@ -374,6 +374,8 @@ class ETL(object):
                         else:
                             Error_Dict[head_value][cell_value] = (column_type,type(cell_value))                                     
                     clogger.error('Values: {0}'.format(insert_list))
+                    elogger.exception(ex)
+                    vlogger.error(ex)
                     #clogger.error(Error_Dict)
                     #raise
 
@@ -425,7 +427,7 @@ class ETL(object):
                  Resolved logic errors created by module resturcturing and logging
     09/10/2015 - Add delimiter parameter to InsertTable for better file control
     09/11/2015 - Add email parameter to InsertTable for better email control
-    
+    11/23/2015 - Add loggers for INSERT INTO error    
     
 *****************************************************************************'''
 
