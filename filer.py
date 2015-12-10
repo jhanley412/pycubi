@@ -278,7 +278,7 @@ class Filer(object):
             Contents = contents_dictionary
             
             start= datetime.datetime.now()
-            Name = FileName.strip('.csv').strip('.txt')+'.csv'
+            Name = FileName.split('.')[0]+'.csv'
             
 
             #CSV Writer. This will read contents using the standardized format {Row#:{Header:Value}}

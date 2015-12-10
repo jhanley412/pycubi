@@ -16,7 +16,7 @@ import easylogging
 
 from cubi.settingsconfig import *
 from cubi.filer import Filer
-from cubi.sql import SQL
+from cubi.cubi_sql import SQL
 from cubi.dataanalysis import DataAnalysis
 #from cubi.sqlwriter import SQLWriter
 
@@ -374,8 +374,8 @@ class ETL(object):
                         else:
                             Error_Dict[head_value][cell_value] = (column_type,type(cell_value))                                     
                     clogger.error('Values: {0}'.format(insert_list))
-                    elogger.exception(ex)
-                    vlogger.error(ex)
+                    elogger.exception(inst)
+                    vlogger.error(inst)
                     #clogger.error(Error_Dict)
                     #raise
 
