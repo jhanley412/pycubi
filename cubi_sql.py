@@ -447,8 +447,47 @@ class SQL(object):
             vlogger.info('Method Complete')
 
 
+    def alter_table(self, action):
+        
+        #Set up logging to output and track all uncaught errors
+        vlogger = self.versatilelogger
+        elogger = self.errorlogger
+        clogger = self.consolelogger
 
-    def alterTable(self, altertype, columnname, datatype):
+        #Begin main logic of function
+        try:
+            #Logging
+            parameters_dictionary = {'Server':self.server, 'Database':self.database, 'TableName':self.table, 'Action': action}
+            vlogger.info('Method Start with parameters {0}'.format(parameters_dictionary))
+
+            if action.upper() == 'DELETE':
+                query = 'DELETE FROM {0}.dbo.{1}'.format(self.database, self.table)
+                
+            elif action.upper() == 'DROP':
+                pass
+            
+            else:
+                vlogger.info('Unknown table action')
+
+            connection = pymssql.connect(server=self.server, database = self.database)
+            cursor = connection.cursor()
+            cursor.execute(query)
+            connection.commit()
+            
+            vlogger.info('Execute {0}'.format(query))
+
+        #Catch and log any errors that cause program to fail
+        except Exception as ex:
+            elogger.exception(ex)
+            vlogger.error(ex)
+            raise
+
+        finally:
+            connection.close()
+            vlogger.info('Method Complete')
+
+            
+    def alter_column(self, altertype, columnname, datatype):
         ''' Add columns to existing SQL table'''
 
         #Set up logging to output and track all uncaught errors

@@ -9,7 +9,7 @@
 *****************************************************************************'''
 
 #Logging output directory location for all scripts within CUBI
-logdirectory = r'Q:\Efficiency\Python'    #Define location of log output directory
+logdirectory = r'Q:\Efficiency\Justin\__logs'    #Define location of log output directory
 
 
 

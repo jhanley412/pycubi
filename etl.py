@@ -39,23 +39,53 @@ class ETL(object):
     ***********************************************************'''
 
     
-    def __init__(self, wtserver, wtdatabase, wttable, filepath, filename):
+    def __init__(self, wtserver, wtdatabase, wttable, filepath = None, filename = None, file_delimiter = '\t', data_header_list = [], data_contents_dictionary = {}):
         self.wtserver = wtserver
         self.wtdatabase = wtdatabase
         self.wttable = wttable
         self.filepath = filepath
         self.filename = filename
-        
-        #easylogging.setupLogging(logoutput_path = __file__)
+        self.file_delimiter = file_delimiter
+        self.data_header_list = data_header_list
+        self.data_contents_dictionary = data_contents_dictionary
+
         easylogging.setupLogging(logoutput_path = logdirectory) #__logs file will be located in Q:\Efficiency 
         self.versatilelogger = logging.getLogger("versatile")
         self.errorlogger = logging.getLogger("error")
         self.consolelogger = logging.getLogger("consoleinfo")
 
+        # Standard output for multiple data input options. Create etl header and contents for sql upload from either a file or data dictionary {R:{C:V}}
+        self.header_list = []
+        self.contents_dictionary = {}
+        self.original_contents_dictionary = {}# Used in excpetion report output. Unaltered, excepted items will write to csv file
+
+        try:
+
+            if len(self.data_header_list) != 0 and len(self.data_contents_dictionary) != 0:
+                #***Consider update. Data dictionary input is not refined. Assuming user input will enter 'Refined' data according to SQL standards.
+                self.header_list = self.data_header_list  #[header.strip().title() for header in self.data_header_list]   
+                self.contents_dictionary = self.data_contents_dictionary #{str(header).strip().title():self.data_contents_dictionary[header] for header in self.data_contents_dictionary}
+                self.original_contents_dictionary = self.data_contents_dictionary #{str(header).strip().title():self.data_contents_dictionary[header] for header in self.data_contents_dictionary}
+
+            elif self.filepath != None and self.filename != None:
+                file = Filer(self.filepath, self.filename)
+                self.header_list = file.fileExtract(output = 'GetRefinedHeader', delimiter = file_delimiter)
+                self.contents_dictionary = file.fileExtract(output = 'GetRefinedContents',delimiter = file_delimiter)
+                self.original_contents_dictionary = file.fileExtract(output = 'GetRefinedContents',delimiter = file_delimiter)
+
+            else:
+                self.versatilelogger.info('No input data defined')
+            
+        except Exception as ex:
+            self.errorlogger.exception(ex)
+            self.versatilelogger.error(ex)
+            raise
+
+
         
-    def insertTable(self, tableexist, delimiter = '\t', email = 'jhanley@arrowheadcu.org', additems_dictionary={}):
+    def insertTable(self, tableexist, action = 'Insert', email = 'jhanley@arrowheadcu.org', additems_dictionary={}):
         '''Map and load data from external source into SQL table.
-           Dependent on cubi.file, cubi.sql, cubi.sqlwriter, cubi.datanalysis'''
+           Dependent on cubi.file, cubi.sql, cubi.sqlwriter, cubi.dataanalysis'''
 
         #Set up logging to output and track all uncaught errors
         vlogger = self.versatilelogger
@@ -71,25 +101,22 @@ class ETL(object):
             database = self.wtdatabase
             table = self.wttable
 
-            parameter_dictionary = {'Server':server, 'DataBase':database, 'Table':table, 'Filepath':self.filepath, 'Filename': self.filename, 'TableExist': tableexist, 'Delimiter': delimiter, 'Email': email, 'AddItems': additems_dictionary} 
+            parameter_dictionary = {'Server':server, 'DataBase':database, 'Table':table, 'Filepath':self.filepath, 'Filename': self.filename, 'Delimiter': self.file_delimiter, 'data_header_list':self.data_header_list , 'data_contents_dictionary':self.data_contents_dictionary, 'TableExist': tableexist, 'Action':action, 'Delimiter': self.file_delimiter, 'Email': email, 'AddItems': additems_dictionary} 
             vlogger.info('Method Start with parameters {0}'.format(parameter_dictionary))
 
             ####
             # Dependencies
             ####
 
+            Header = self.header_list
+            Contents = self.contents_dictionary
+            OriginalContents = self.original_contents_dictionary    
             refinedadditems_dictionary = {header.strip().title():additems_dictionary[header] for header in additems_dictionary}
-                
-            #File Class
-            file = Filer(self.filepath, self.filename)
-
-            Header = file.fileExtract(output = 'GetRefinedHeader', delimiter = delimiter)
+            
             # Add headers from additems_dictionary to header
             for newheader in refinedadditems_dictionary:
                 Header.append(newheader)
-            
-            Contents = file.fileExtract(output = 'GetRefinedContents',delimiter = delimiter)
-            OriginalContents = file.fileExtract(output = 'GetRefinedContents',delimiter = delimiter)
+    
             # Add key:value pairs from additems_dictionary to contents
             for updaterow in Contents:
                 Contents[updaterow].update(refinedadditems_dictionary)
@@ -98,9 +125,10 @@ class ETL(object):
             #DataAnalysis Class
             Data = DataAnalysis(Header, Contents)
             InputHeaderDataTypes_Dictionary = Data.dataType(output='GETSQLDATATYPES')
-            #SQLWriter
-            sql = SQL(server, database,table)
 
+            #SQL action. Process table actions prior to insert.
+            sql = SQL(server, database,table)
+            
             #Prompt to ask if SQL table already exists before adding conents. Will create table if prompted to.
             ##This will need to change to look for table automatically
             ''' Changed this logic for automation
@@ -116,16 +144,21 @@ class ETL(object):
                 else:
                     print("I don't understand...Please enter 'Y' or 'N'")
             '''
+            
             if tableexist.upper() == 'N':
                 sql.createTableAdmin(Header, InputHeaderDataTypes_Dictionary)
+            elif tableexist.upper() == 'Y' and action.upper() == 'REPLACE':
+                sql.alter_table('DELETE')
             elif tableexist.upper() == 'Y':
                 pass
             else:
                 vlogger.info('Did not properly define Table Exist parameter {0}'.format({'TableExist':tableexist}))
                 #sys.exit() #Do we want to exit program or try to find match if table is defined?
 
+                
+
             
-            #SQL Class - This pulls information after table creation (if necessary) so that we can have most updated table info
+            # SQL Class - This pulls information after table creation (if necessary) so that we can have most updated table info
             sql1_object = SQL(server, database, table)
             SQLHeader_List = sql1_object.tableLookup('GetInsertHeader')
             SQLHeaderDataType_dictionary = sql1_object.tableLookup('GetSQLDataTypes')
@@ -198,7 +231,7 @@ class ETL(object):
                                             HeaderType_dict = {}
                                             HeaderType_dict[ProperHeaderItem.strip()] = AddColumnType
                                             Temp_Transform_Dict['Add'] = HeaderType_dict
-                                            sql.alterTable('AddColumn',ProperHeaderItem,AddColumnType)
+                                            sql.alter_column('AddColumn',ProperHeaderItem,AddColumnType)
                                             print('Adding',ProperHeaderItem,'. Continuing to next column')
                                             AlterTableAnswer = True
                                         elif VerifyAdd == 'N':
