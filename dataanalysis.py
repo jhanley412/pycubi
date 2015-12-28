@@ -100,7 +100,7 @@ class DataAnalysis(object):
 
                 #SQL Data type mapping. Use this to tie SQL Data types for table creation and type optimization. Format {DataTypeName:{min:max}}
                 #SQLDataType_Dictionary = {'float':(('decimal',4,15)),'int':(('bit',0,1),('tinyint',0,255),('smallint',-32768,32767), ('int',-2147483648,2147483647),('bigint',math.pow(-2,63),(math.pow(2,63)-1))),'datetime':(('smalldatetime',datetime.datetime(1900,1,1,0,0),datetime.datetime(2079,6,6,0,0)),('datetime',datetime.datetime(1753,1,1,0,0),datetime.datetime(9999,12,31,0,0))),'str':(('varchar',0,8000)), 'NoneType':(('varchar',0,8000))}
-                SQLDataType_Dictionary = {'float':[('decimal',4,15)],'int':[('bit',0,1),('tinyint',0,255),('smallint',-32768,32767), ('int',-2147483648,2147483647),('bigint',math.pow(-2,63),(math.pow(2,63)-1))],'datetime':[('smalldatetime',datetime.datetime(1900,1,1,0,0),datetime.datetime(2079,6,6,0,0)),('datetime',datetime.datetime(1753,1,1,0,0),datetime.datetime(9999,12,31,0,0))],'str':[('varchar',0,8000)], 'NoneType':[('varchar',0,8000)]}
+                SQLDataType_Dictionary = {'float':[('decimal',5,15)],'int':[('bit',0,1),('tinyint',0,255),('smallint',-32768,32767), ('int',-2147483648,2147483647),('bigint',math.pow(-2,63),(math.pow(2,63)-1))],'datetime':[('smalldatetime',datetime.datetime(1900,1,1,0,0),datetime.datetime(2079,6,6,0,0)),('datetime',datetime.datetime(1753,1,1,0,0),datetime.datetime(9999,12,31,0,0))],'str':[('varchar',0,8000)], 'NoneType':[('varchar',0,8000)]}
 
                 #Initialize dictionaries with empty header lists. This will be used to append data values and types to above dictionaries.
                 for Header in Header_List:
@@ -118,6 +118,8 @@ class DataAnalysis(object):
                 for row in Contents_Dictionary:
                     for Header in Header_List:
 
+                        
+
                         #Change all empty strings to NoneType or 0
                         if Contents_Dictionary[row][Header] == '':
                             No_Value = None
@@ -130,9 +132,12 @@ class DataAnalysis(object):
 
                         #Begin item values conversion
                         else:
+                            #To properly raise a python ValueError, item needs convert from a string
+                            data_str_item = str(Contents_Dictionary[row][Header])
+
                             #Convert value to an integer
                             try:
-                                int_value = int(Contents_Dictionary[row][Header])
+                                int_value = int(data_str_item)
                                 ColumnValue_Dictionary[Header].append(int_value)
                                 ColumnType_Dictionary[Header].append(type(int_value).__name__)
                                 #print(item, '\t', Contents_Dictionary[0][item], '\t', int(Contents_Dictionary[0][item]))
@@ -141,7 +146,7 @@ class DataAnalysis(object):
 
                                 #Convert value to float
                                 try:
-                                    float_value = float(Contents_Dictionary[row][Header])
+                                    float_value = float(data_str_item)
                                     ColumnValue_Dictionary[Header].append(float_value)
                                     ColumnType_Dictionary[Header].append(type(float_value).__name__)
                                     #print(item, '\t', Contents_Dictionary[0][item], '\t', float(Contents_Dictionary[0][item]))
@@ -150,7 +155,7 @@ class DataAnalysis(object):
 
                                     #Convert value to datetime with input MM/DD/YYYY
                                     try:
-                                        date_value = datetime.datetime.strptime(Contents_Dictionary[row][Header], '%m/%d/%Y')
+                                        date_value = datetime.datetime.strptime(data_str_item, '%m/%d/%Y')
                                         ColumnValue_Dictionary[Header].append(date_value)
                                         ColumnType_Dictionary[Header].append(type(date_value).__name__)
                                         
@@ -158,7 +163,7 @@ class DataAnalysis(object):
 
                                         #Convert value to datetime with input MM/DD/YY
                                         try:
-                                            date_value = datetime.datetime.strptime(Contents_Dictionary[row][Header], '%m/%d/%y')
+                                            date_value = datetime.datetime.strptime(data_str_item, '%m/%d/%y')
                                             ColumnValue_Dictionary[Header].append(date_value)
                                             ColumnType_Dictionary[Header].append(type(date_value).__name__)
                                             
@@ -166,7 +171,7 @@ class DataAnalysis(object):
 
                                             #Convert value to datetime with input MM-DD-YYYY
                                             try:
-                                                date_value = datetime.datetime.strptime(Contents_Dictionary[row][Header], '%m-%d-%Y')
+                                                date_value = datetime.datetime.strptime(data_str_item, '%m-%d-%Y')
                                                 ColumnValue_Dictionary[Header].append(date_value)
                                                 ColumnType_Dictionary[Header].append(type(date_value).__name__)
 
@@ -174,7 +179,7 @@ class DataAnalysis(object):
 
                                                 #Convert value to datetime with input MM-DD-YY
                                                 try:
-                                                    date_value = datetime.datetime.strptime(Contents_Dictionary[row][Header], '%m-%d-%y')
+                                                    date_value = datetime.datetime.strptime(data_str_item, '%m-%d-%y')
                                                     ColumnValue_Dictionary[Header].append(date_value)
                                                     ColumnType_Dictionary[Header].append(type(date_value).__name__)
 
@@ -183,7 +188,7 @@ class DataAnalysis(object):
 
                                                     #Convert value to datetime with input YYYY-MM-DD
                                                     try:
-                                                        date_value = datetime.datetime.strptime(Contents_Dictionary[row][Header], '%Y-%m-%d')
+                                                        date_value = datetime.datetime.strptime(data_str_item, '%Y-%m-%d')
                                                         ColumnValue_Dictionary[Header].append(date_value)
                                                         ColumnType_Dictionary[Header].append(type(date_value).__name__)
 
@@ -191,7 +196,7 @@ class DataAnalysis(object):
                                                         
                                                         #Convert value to string
                                                         try:
-                                                            string_value = str(Contents_Dictionary[row][Header])
+                                                            string_value = str(data_str_item)
                                                             ColumnValue_Dictionary[Header].append(string_value)
                                                             ColumnType_Dictionary[Header].append(type(string_value).__name__)
                                                             #print(item, '\t', Contents_Dictionary[0][item], '\t', str(Contents_Dictionary[0][item]))
@@ -203,7 +208,8 @@ class DataAnalysis(object):
                 # Create ColumnMaxDataType_Dictionary and ColumnSQLDataType dictionary
                 #       Runs through each column and looks at best option for data type, finds max of that data type and builds SQL version of dataname
                 #####
-
+                print(ColumnType_Dictionary)
+                print(ColumnValue_Dictionary)
 
                 #List data types to categorize max values (in order of precedence)
                 DataTypes_List = ('str','float', 'int', 'datetime', 'NoneType')
@@ -240,6 +246,22 @@ class DataAnalysis(object):
                                     #Use list comprehenshion to remove strings in non string columns
                                     Filtered_List = [i for i in ColumnValue_Dictionary[header] if type(i).__name__ != 'NoneType' ]  #removes Nonetype items in non string item lists
                                     MaxItemValue = max(Filtered_List)
+
+                                    #Dynamically build the precision and scale of all float items for better accuracy
+                                    if DataTypeItem == 'float':
+                                        float_precision_size_list = []
+                                        float_scale_size_list = []
+                                        for float_item in Filtered_List:
+                                            split_float_list = str(float(float_item)).split('.')
+                                            len_left_decimal = len(split_float_list[0])
+                                            len_right_decimal = len(split_float_list[1])
+                                            float_precision_size_list.append(len_left_decimal + len_right_decimal)
+                                            float_scale_size_list.append(len_right_decimal)
+
+                                        max_float_precision = max(float_precision_size_list)
+                                        max_float_scale = max(float_scale_size_list)
+                                            
+                                        
                                 #print(n, header, item, MaxItemValue)
 
                                 
@@ -257,7 +279,8 @@ class DataAnalysis(object):
                                         #print(n, header, OutputSQLDatatype)
                                         break
                                     elif DataTypeItem == 'float':
-                                        OutputSQLDatatype = ''.join([SQLDataType[0],'(',str(SQLDataType[2]),',',str(SQLDataType[1]),')'])
+                                        #OutputSQLDatatype = ''.join([SQLDataType[0],'(',str(SQLDataType[2]),',',str(SQLDataType[1]),')'])
+                                        OutputSQLDatatype = ''.join([SQLDataType[0],'(',str(max_float_precision),',',str(max_float_scale),')'])
                                         #print(n, header, OutputSQLDatatype)
                                         break
                                     elif DataTypeItem == 'datetime' and SQLDataType[1] <= MaxItemValue <= SQLDataType[2]:
