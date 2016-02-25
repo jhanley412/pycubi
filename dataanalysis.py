@@ -208,8 +208,6 @@ class DataAnalysis(object):
                 # Create ColumnMaxDataType_Dictionary and ColumnSQLDataType dictionary
                 #       Runs through each column and looks at best option for data type, finds max of that data type and builds SQL version of dataname
                 #####
-                print(ColumnType_Dictionary)
-                print(ColumnValue_Dictionary)
 
                 #List data types to categorize max values (in order of precedence)
                 DataTypes_List = ('str','float', 'int', 'datetime', 'NoneType')
