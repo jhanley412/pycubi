@@ -77,7 +77,7 @@ class Filer(object):
             AlteredData_Dictionary = {}
 
             #Initialize character items that we want to scrub from inputs
-            ColumnNameAlter_Dictionary = {' ':'' , '-':'_' , '+':'PLUS',  '#':'Number',  '/':'_' , '(':'_' , ')':'', "'":'', '.':'', '3rd':'Third', '\n':'', '\\':''}
+            ColumnNameAlter_Dictionary = {' ':'' , "'":'', '-':'_' , '+':'PLUS',  '#':'Number',  '/':'_' , '(':'_' , ')':'', "'":'', '.':'', '3rd':'Third', '\n':'', '\\':''}
             ContentValueAlter_Dictionary = {',':'','$':'','%':'','"':'', '\n':'', '(':'-', ')': '', '[':'', ']':''}
 
             ##################################
