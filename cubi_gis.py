@@ -14,24 +14,23 @@ import re
 
 
 class GIS(object):
-    """ CUBI's geospatial framework"""
+    """CUBI's geospatial framework"""
     
 
     def __init__(self):
-    """
-        As class is built out, look to migrate common varibales in initialization.
-        This should be a template for geocoding, mapping, and analyzing.
-    """
+        """
+            As class is built out, look to migrate common varibales in initialization.
+            This should be a template for geocoding, mapping, and analyzing.
+        """
     
 
     def geocode_address(self, address, geocoder):
-        """Geocode a given address with a geocode service
-
-        See geopy  documentation at http://geopy.readthedocs.org/en/latest/
-        for list of geocode services
-
-        'address' paramter is scrubbed on client, in addition
-        to any geocode service processing.
+        """Geocode a given address with a geocode service.         
+        :Paramters:
+            - 'address': A single string represented address. Paramter is scrubbed on client, in addition
+               to any geocode service processing.
+            - 'geocoder': A string represented geocoding service provider. See geopy  documentation at http://geopy.readthedocs.org/en/latest/
+               for list of geocode services.
 
         Method returns dictionary of address items from geocode services. Raw
         output will differ between service API's
@@ -39,7 +38,7 @@ class GIS(object):
         
         # Create geocoder with string object and find address from service
         geolocator = geopy.geocoders.get_geocoder_for_service(geocoder)
-        address = re.sub(r'\$|#|"|:', ' ', self.address)
+        address = re.sub(r'\$|#|"|:', ' ', address)
         location = geolocator().geocode(address)    
         
         # Flatten raw return data for normalization. This must be manually mapped otherwise filed will return None
@@ -57,7 +56,6 @@ class GIS(object):
                     ,'return_address': location.raw['name']
                 }
             elif geolocator.__name__ == 'Nominatim':
-                print('Hello World')
                 mapped_items = {
                     'longitude':location.raw['lon']
                     ,'latitude': location.raw['lat']
