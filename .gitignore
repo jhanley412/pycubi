@@ -1,0 +1,4 @@
+*.pyc
+*.pyd
+__pycache__
+settingsconfig.py
