@@ -1,6 +1,6 @@
 '''******************************************************************************
 
-    CUBI Initialization v0.2.1
+    CUBI Initialization
     Date Last Updated: 02/25/2016
     Created by: Justin Hanley
     Notes
@@ -8,16 +8,6 @@
 
 *****************************************************************************'''
 
-
-
-#Initialize ETL module
-from cubi.filer import *
-from cubi.dataanalysis import *
-from cubi.cubi_sql import *
-from cubi.etl import *
-from cubi.settingsconfig import *
-from cubi.sql_function import *
-from cubi.cubi_gis import *
 
 
 '''******************************************************************************
