@@ -12,7 +12,7 @@ import re
 import os
 import datetime
 import sys
-import cubi
+from cubi import cubi_sql
 
 class Function_Builder(object):
 
@@ -312,7 +312,7 @@ class Function_Builder(object):
                 file_object.write(full_query)
                 file_object.close() 
 
-            sql_connect = cubi.cubi_sql.SQL(server, database)
+            sql_connect = cubi_sql.SQL(server, database)
             if output.upper() == 'GETRESULTSET':
                 # GetContents of query
                 if output_format.upper() == 'DICTIONARY':
