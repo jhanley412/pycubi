@@ -14,11 +14,10 @@
 
 import easylogging
 
-from cubi.settingsconfig import *
-from cubi.filer import Filer
-from cubi.cubi_sql import SQL
-from cubi.dataanalysis import DataAnalysis
-#from cubi.sqlwriter import SQLWriter
+from pycubi.settingsconfig import *
+from pycubi.filer import Filer
+from pycubi.cubi_sql import SQL
+from pycubi.dataanalysis import DataAnalysis
 
 import datetime
 import pymssql

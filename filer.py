@@ -11,7 +11,7 @@
 
 import easylogging
 
-from cubi.settingsconfig import *
+from pycubi.settingsconfig import *
 
 import sys
 import csv

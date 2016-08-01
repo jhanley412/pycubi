@@ -12,7 +12,7 @@ import re
 import os
 import datetime
 import sys
-from cubi import cubi_sql
+from pycubi import cubi_sql
 
 class Function_Builder(object):
 
