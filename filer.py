@@ -62,7 +62,7 @@ class Filer(object):
 
             #Defining input parameters for use
             filename = self.filename
-            filenameext = filename.split('.')[1]
+            filenameext = filename.split('.')[-1]
             input_file = open(self.file)
 
             #Raw input items from input file
