@@ -193,16 +193,56 @@ class DataAnalysis(object):
                                                         ColumnType_Dictionary[Header].append(type(date_value).__name__)
 
                                                     except ValueError:
-                                                        
-                                                        #Convert value to string
-                                                        try:
-                                                            string_value = str(data_str_item)
-                                                            ColumnValue_Dictionary[Header].append(string_value)
-                                                            ColumnType_Dictionary[Header].append(type(string_value).__name__)
-                                                            #print(item, '\t', Contents_Dictionary[0][item], '\t', str(Contents_Dictionary[0][item]))
 
-                                                        except ValueError as ve:
-                                                            vlogger.info('Value conversion error - {0} {1}'.format(Header, ve.args))
+                                                        #Convert value to datetime with input MM/DD/YYYY HH:MM (24 HR Clock)
+                                                        try:
+                                                            date_value = datetime.datetime.strptime(data_str_item, '%m/%d/%Y %H:%M')
+                                                            ColumnValue_Dictionary[Header].append(date_value)
+                                                            ColumnType_Dictionary[Header].append(type(date_value).__name__)
+
+                                                        except ValueError:
+
+                                                            #Convert value to datetime with input MM/DD/YYYY HH:MM:SS (24 HR Clock)
+                                                            try:
+                                                                date_value = datetime.datetime.strptime(data_str_item, '%m/%d/%Y %H:%M:%S')
+                                                                ColumnValue_Dictionary[Header].append(date_value)
+                                                                ColumnType_Dictionary[Header].append(type(date_value).__name__)
+
+                                                            except ValueError:
+
+                                                                #Convert value to datetime with input MM/DD/YYYY HH:MM:SS AM/PM (12 HR Clock)
+                                                                try:
+                                                                    date_value = datetime.datetime.strptime(data_str_item, '%m/%d/%Y %I:%M:%S %p')
+                                                                    ColumnValue_Dictionary[Header].append(date_value)
+                                                                    ColumnType_Dictionary[Header].append(type(date_value).__name__)
+
+                                                                except ValueError:
+
+                                                                    #Convert value to datetime with input (Month Locale Abb DD, YYYY H:M:S Locale AM/PM) (i.e Aug 24, 2016 2:46:00 PM) (12 HR Clock)
+                                                                    try:
+                                                                        date_value = datetime.datetime.strptime(data_str_item, '%b %d, %Y %I:%M:%S %p')
+                                                                        ColumnValue_Dictionary[Header].append(date_value)
+                                                                        ColumnType_Dictionary[Header].append(type(date_value).__name__)
+
+                                                                    except ValueError:
+
+                                                                        #Convert value to datetime with input (Month Locale Abb DD YYYY H:M:S Locale AM/PM) (i.e Aug 24 2016 2:46:00 PM) (12 HR Clock)
+                                                                        try:
+                                                                            date_value = datetime.datetime.strptime(data_str_item, '%b %d %Y %I:%M:%S %p')
+                                                                            ColumnValue_Dictionary[Header].append(date_value)
+                                                                            ColumnType_Dictionary[Header].append(type(date_value).__name__)
+
+                                                                        except ValueError:
+
+                                                                            #Convert value to string
+                                                                            try:
+                                                                                string_value = str(data_str_item)
+                                                                                ColumnValue_Dictionary[Header].append(string_value)
+                                                                                ColumnType_Dictionary[Header].append(type(string_value).__name__)
+                                                                                #print(item, '\t', Contents_Dictionary[0][item], '\t', str(Contents_Dictionary[0][item]))
+
+                                                                            except ValueError as ve:
+                                                                                vlogger.info('Value conversion error - {0} {1}'.format(Header, ve.args))
 
                 #####
                 # Create ColumnMaxDataType_Dictionary and ColumnSQLDataType dictionary

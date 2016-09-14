@@ -414,22 +414,25 @@ class SQL(object):
             while Confirmation == False:
                 vlogger.info('Table creation query - {0}'.format(repr(Query)))
                 confirm_prompt = (input('Please Verify SQL: Creating {0}.dbo.{1} table. Would you like to continue? (Y/N) '.format(Database, TableName))).upper()
-                if confirm_prompt == 'Y':
+                if confirm_prompt.upper() == 'Y':
                         cursor.execute(Query)
                         connection.commit() #Commits current transaction to DB. Must call this method to persist data. Must use this after every cursor.execute()
                         vlogger.info('Commited table creation')
                         Confirmation = True
-                elif confirm_prompt == 'N':
+                        return True
+                elif confirm_prompt.upper() == 'N':
                         vlogger.info('Cancelled table creation')
                         Confirmation = True
+                        return False
                 ##Secret Option for ease of use. This will need to be patched when moved to production (SQL Injection)
-                elif confirm_prompt == 'EDIT':
+                elif confirm_prompt.upper() == 'EDIT':
                     vlogger.info('Entered Creation Table edit mode')
                     Query = input("Enter 'Create Table' query")
                     cursor.execute(Query)
                     connection.commit()
                     vlogger.info('Altered Table creation query - {0}\nCommited table creation'.format(repr(Query)))
                     Confirmation = True
+                    return True
                     
                     
                 else:
@@ -463,19 +466,20 @@ class SQL(object):
             if action.upper() == 'DELETE':
                 query = 'DELETE FROM {0}.dbo.{1}'.format(self.database, self.table)
                 
-            elif action.upper() == 'DROP':
-                pass
-            
+            #elif action.upper() == 'DROP':    #Drop will need to be mapped in future. Will return dalse until then
+            #    pass
+            #   
             else:
                 vlogger.info('Unknown table action')
-
+                
             connection = pymssql.connect(server=self.server, database = self.database)
             cursor = connection.cursor()
             cursor.execute(query)
             connection.commit()
-            
-            vlogger.info('Execute {0}'.format(query))
 
+            vlogger.info('Execute {0}'.format(query))
+            return True
+        
         #Catch and log any errors that cause program to fail
         except Exception as ex:
             elogger.exception(ex)
@@ -516,15 +520,18 @@ class SQL(object):
             Query = None
             if AlterType.upper() == 'ADDCOLUMN':
                 Query = 'ALTER TABLE {0} ADD {1} {2}'.format(Table,ColumnName.strip().title(),DataType)
-            if AlterType.upper() == 'DELETECOLUMN':
-                vlogger.info('This only to show logic. Not currently mapped to query')
+                
+            #if AlterType.upper() == 'DELETECOLUMN':
+            #    vlogger.info('This only to show logic. Not currently mapped to query')
             else:
                 vlogger.info('Please define appropriate AlterType. (ColumnAdd)')
-
+                
             cursor.execute(Query)
             connection.commit()
+            
             vlogger.info('Commited table alteration with query - {0}'.format(repr(Query)))
-
+            return True
+        
         #Catch and log any errors that cause program to fail
         except Exception as ex:
             elogger.exception(ex)
@@ -587,13 +594,14 @@ class SQL(object):
                             VerifiedDelete = True
                         else:
                             clogger.info('Invalid response. Please enter Y or N')
-                                  
+                    return True
                 elif Verification == 'N':
                     vlogger.info('Cancelled Table transfer with query {0}'.format(repr(InsertIntoQuery)))
                     Verified = True
+                    return False
                 else:
                     clogger.info('Invalid response. Please enter Y or N')
-                
+                    return False
 
         #Catch and log any errors that cause program to fail
         except Exception as ex:

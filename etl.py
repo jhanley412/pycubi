@@ -145,7 +145,10 @@ class ETL(object):
             '''
             
             if tableexist.upper() == 'N':
-                sql.createTableAdmin(Header, InputHeaderDataTypes_Dictionary)
+                create_table = sql.createTableAdmin(Header, InputHeaderDataTypes_Dictionary)
+                #Close program if table creation prompt is cancelled
+                if create_table == False:
+                    raise SystemExit
             elif tableexist.upper() == 'Y' and action.upper() == 'REPLACE':
                 sql.alter_table('DELETE')
             elif tableexist.upper() == 'Y':
