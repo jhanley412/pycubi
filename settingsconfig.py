@@ -9,9 +9,9 @@
 *****************************************************************************'''
 
 #Logging output directory location for all scripts within CUBI
-#logdirectory = r'Q:\Efficiency\Justin\__logs'    #Define location of log output directory
-logdirectory = r'Q:\Efficiency\__logs__'
-
+#logdirectory = r'Q:\Efficiency\Team\Business Intelligence\Justin\__logs'    #Define location of log output directory
+logdirectory = r'\\acufs\master\Efficiency\__logs__'
+#logdirectory = r'\\acufs\master\Development\Production Code\BusinessIntelligence\ATMProcess\__logs'
 
 
 

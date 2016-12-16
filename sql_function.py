@@ -225,7 +225,7 @@ class Function_Builder(object):
                     ##Begin to build main query output by commenting unwanted LEFT JOINS according to python lens parameter
                     for left_join_item in sql_left_join_list[1:]:
                         add_sql_join_string = 'LEFT OUTER JOIN' + left_join_item
-                        if lens_item_comparision.title() in left_join_item.title():
+                        if lens_item_comparision.title() in left_join_item.title() and add_sql_join_string not in optimized_sql_output_main_query:
                             optimized_sql_output_main_query += add_sql_join_string
                         ''' Consider how to add a commented section to output
                         else:

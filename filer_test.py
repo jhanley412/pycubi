@@ -142,12 +142,19 @@ class Filer(object):
             if output.upper() == 'GETREFINEDHEADER' or output.upper() == 'GETREFINEDCONTENTS':
                 #Logic to use ColumnName Alter mappings to remove unwanted characters in output
                 for item in RawHeader_List:
+                    n=2
                     header_alter = item
                     for alteration in ColumnNameAlter_Dictionary:
                         if alteration in header_alter:
-                            header_alter = header_alter.replace(alteration, ColumnNameAlter_Dictionary[alteration])     
+                            header_alter = header_alter.replace(alteration, ColumnNameAlter_Dictionary[alteration])
                         else:
                             continue
+                    if header_alter in AlteredHeader_List:
+                        print(header_alter, 'in list')
+                        header_alter = header_alter + '_{0}'.format(n)
+                        print(header_alter)
+                        n+=1
+
                     AlteredHeader_List.append(header_alter)
 
                 #Find duplicate item in alter header
